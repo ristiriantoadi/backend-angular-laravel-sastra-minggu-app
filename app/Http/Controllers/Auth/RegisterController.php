@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -50,10 +51,23 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'username' => ['required', 'string', 'max:255'],
+            // 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+    }
+
+    protected function register(Request $request){
+        error_log($request->username);
+        return User::create([
+            'username' => $request->username,
+            'nama_lengkap'=>"admin",
+            'role'=>'admin',
+            // 'email' => $data['email'],
+            'password' => Hash::make($request->password),
+        ]);
+        Auth::logout();
+        // return redirect('/register?success');
     }
 
     /**
@@ -62,12 +76,15 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \App\Models\User
      */
-    protected function create(array $data)
-    {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
-    }
+    // protected function create(array $data)
+    // {
+    //     error_log($data);
+    //     return User::create([
+    //         'username' => $data['username'],
+    //         'nama_lengkap'=>"admin",
+    //         'role'=>'admin',
+    //         // 'email' => $data['email'],
+    //         'password' => Hash::make($data['password']),
+    //     ]);
+    // }
 }
