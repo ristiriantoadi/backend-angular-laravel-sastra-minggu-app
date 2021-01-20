@@ -52,22 +52,18 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'username' => ['required', 'string', 'max:255'],
-            // 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
 
     protected function register(Request $request){
-        error_log($request->username);
         return User::create([
             'username' => $request->username,
             'nama_lengkap'=>"admin",
             'role'=>'admin',
-            // 'email' => $data['email'],
             'password' => Hash::make($request->password),
         ]);
         Auth::logout();
-        // return redirect('/register?success');
     }
 
     /**

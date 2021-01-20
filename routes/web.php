@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,12 @@ Auth::routes();
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/home', function(){
-    return "haleluya";
+
+    return response()->json([
+        'id' => Auth::user()->id,
+        'nama_lengkap' => Auth::user()->nama_lengkap,
+        'username' => Auth::user()->username,
+        'role' => Auth::user()->role
+    ]);
 })->name('home');
 
