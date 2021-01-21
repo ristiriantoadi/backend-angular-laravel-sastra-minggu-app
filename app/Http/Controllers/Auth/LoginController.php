@@ -39,9 +39,6 @@ class LoginController extends Controller
     {
         error_log("called");
         $credentials = $request->only('username', 'password');
-        error_log($credentials['password']);
-        error_log($credentials['username']);
-        error_log(Hash::make($credentials['password']));
         if (Auth::guard('web')->attempt($credentials,$request)) {
             return response()->json([
                 'id' => Auth::user()->id,

@@ -46,6 +46,18 @@ class RegisterController extends Controller
         error_log("Nama Lengkap: ".$request->namaLengkap);
         error_log("Password: ".$request->password);
         error_log("Username: ".$request->username);
+
+        $namaLengkap = $request->namaLengkap;
+        $password = $request->password;
+        $username = $request->username;
+
+        //check if username already exist
+        $users = User::where('username',$username)->get();
+        if(count($users) != 0){
+            return response()->json([
+                'message' => 'username tidak tersedia'
+            ]);
+        }
     }
 
     /**
