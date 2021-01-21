@@ -18,6 +18,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+Route::post("/register/user",'App\Http\Controllers\Auth\RegisterController@registerUser');
 Auth::routes();
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

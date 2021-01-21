@@ -42,6 +42,12 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    public function registerUser(Request $request){
+        error_log("Nama Lengkap: ".$request->namaLengkap);
+        error_log("Password: ".$request->password);
+        error_log("Username: ".$request->username);
+    }
+
     /**
      * Get a validator for an incoming registration request.
      *
