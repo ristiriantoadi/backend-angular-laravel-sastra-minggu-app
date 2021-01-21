@@ -43,10 +43,6 @@ class RegisterController extends Controller
     }
 
     public function registerUser(Request $request){
-        error_log("Nama Lengkap: ".$request->namaLengkap);
-        error_log("Password: ".$request->password);
-        error_log("Username: ".$request->username);
-
         $namaLengkap = $request->namaLengkap;
         $password = $request->password;
         $username = $request->username;
@@ -68,7 +64,8 @@ class RegisterController extends Controller
 
         if($user){
             return response()->json([
-                'message' => 'success'
+                'message' => 'success',
+                'user'=>$user
             ]);
         }
     }
