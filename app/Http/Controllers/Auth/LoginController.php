@@ -35,18 +35,24 @@ class LoginController extends Controller
         return 'username';
     }
 
-    // public function login(Request $request)
-    // {
-    //     $credentials = $request->only('username', 'password');
-    //     error_log($credentials['password']);
-    //     error_log($credentials['username']);
-    //     error_log(Hash::make($credentials['password']));
-    //     if (Auth::guard('web')->attempt($credentials,$request)) {
-    //         return Auth::user();
-    //     }else{
-    //         dd("wrong");
-    //     }
-    // }
+    public function login(Request $request)
+    {
+        error_log("called");
+        $credentials = $request->only('username', 'password');
+        error_log($credentials['password']);
+        error_log($credentials['username']);
+        error_log(Hash::make($credentials['password']));
+        if (Auth::guard('web')->attempt($credentials,$request)) {
+            return response()->json([
+                'id' => Auth::user()->id,
+                'namaLengkap' => Auth::user()->nama_lengkap,
+                'username' => Auth::user()->username,
+                'role' => Auth::user()->role
+            ]);
+        }else{
+            return abort(401);
+        }
+    }
 
     /**
      * Create a new controller instance.

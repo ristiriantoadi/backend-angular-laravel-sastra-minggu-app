@@ -25,9 +25,13 @@ Route::get('/home', function(){
 
     return response()->json([
         'id' => Auth::user()->id,
-        'nama_lengkap' => Auth::user()->nama_lengkap,
+        'namaLengkap' => Auth::user()->nama_lengkap,
         'username' => Auth::user()->username,
         'role' => Auth::user()->role
     ]);
 })->name('home');
 
+Route::get('/logout', function(){
+    Auth::logout();
+    return "logged out";
+})->name('logout');
