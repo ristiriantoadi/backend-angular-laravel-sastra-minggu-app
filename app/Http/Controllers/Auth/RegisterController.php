@@ -58,6 +58,19 @@ class RegisterController extends Controller
                 'message' => 'username tidak tersedia'
             ]);
         }
+
+        $user = User::create([
+            'username' => $username,
+            'nama_lengkap'=>$namaLengkap,
+            'role'=>'user',
+            'password' => Hash::make($password),
+        ]);
+
+        if($user){
+            return response()->json([
+                'message' => 'success'
+            ]);
+        }
     }
 
     /**
