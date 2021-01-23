@@ -7,5 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Entri extends Model
 {
-    use HasFactory;
+    use HasFactory;    
+
+    protected $fillable = [
+        'nama_pengarang',
+        'judul_karya',
+        'jenis_karya',
+        'media',
+        'tanggal_muat',
+        'user_id_pengarang',
+        'user_id_pembuat_entri'
+    ];
 }

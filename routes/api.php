@@ -18,7 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Route::middleware('auth:sanctum')->post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri');
-Route::post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri');
+Route::middleware('auth:sanctum')->post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri');
+// Route::post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri');
 
 // Route::post('/login', 'App\Http\Controllers\Auth\LoginController@login');
