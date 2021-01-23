@@ -54,4 +54,10 @@ class LaporanPemuatanController extends Controller{
         ]);
 
     }
+
+    public function getEntri(Request $request){
+        return response()->json([
+            'entris' => Entri::all()
+        ]);
+    }
 }

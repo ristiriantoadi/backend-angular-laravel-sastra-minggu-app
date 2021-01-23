@@ -18,6 +18,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/laporan_pemuatan',  'App\\Http\\Controllers\\LaporanPemuatanController@getEntri');
+
 Route::middleware('auth:sanctum')->post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri');
 // Route::post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri');
 
