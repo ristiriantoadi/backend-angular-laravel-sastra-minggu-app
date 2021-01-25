@@ -50,12 +50,22 @@ class LaporanPemuatanController extends Controller{
     public function getEntri(Request $request){
 
         //get entri and the pengarang of entri
-        $entris = DB::table('entris')
+        $entris_with_pengarang_in_system = DB::table('entris')
             ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
             // ->select('users.*', 'contacts.phone', 'orders.price')
             ->select('users.nama_lengkap', 'entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
             'entris.tanggal_muat')
             ->get();
+
+        $entris_without_pengarang_in_system = DB::table('entris')->where('user_id_pengarang', '=', 0)
+        ->select('entris.nama_pengarang AS nama_lengkap','entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
+        'entris.tanggal_muat')
+        ->get();
+
+        $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
+
+        // $entris=array_merge($entris_with_pengarang_in_system,$entris_without_pengarang_in_system);
+
 
         return response()->json([
             'entris' => $entris
