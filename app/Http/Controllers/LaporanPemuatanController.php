@@ -22,31 +22,9 @@ class LaporanPemuatanController extends Controller{
             'user_id_pengarang'=>$request->idPengarang,
         ]);
         if($entri){
-           
-            //uploading file
-            // $filename = $request->file('fileBuktiPemuatan')->getClientOriginalName();
-            // $extension = ".".explode(".",$filename)[count(explode(".",$filename))-1];
-            // $filename = $entri->id."".$extension;
-            // $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan",$filename);
-            // error_log($file);
-            // if($file){
-
-            //     $entri = DB::table('entris')
-            //     ->where('id', $entri->id)
-            //     ->update(['bukti_pemuatan' => $filename]);
-
-            //     if($entri){
-            //         return response()->json([
-            //             'message' => 'success',
-            //             'entri' => $entri,
-            //         ]);
-            //     }
-            // }
 
             $filename = $request->file('fileBuktiPemuatan')->getClientOriginalName();
-            $filename=rawurlencode($filename);
-            // $extension = ".".explode(".",$filename)[count(explode(".",$filename))-1];
-            // $filename = $entri->id."".$extension;
+            // $filename=rawurlencode($filename);
             $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan/".$entri->id,$filename);
             error_log($file);
             if($file){
@@ -104,5 +82,16 @@ class LaporanPemuatanController extends Controller{
                 'message' => 'success',
              ]);
         }
+    }
+
+    public function deleteEntri(Request $request){
+        // error_log("Id entri: ".$request->id);
+        $entri = Entri::find($request->id);
+        if( $entri->delete()){
+            return response()->json([
+                'message' => 'success'
+             ]);
+        }
+        // error_log($result);
     }
 }
