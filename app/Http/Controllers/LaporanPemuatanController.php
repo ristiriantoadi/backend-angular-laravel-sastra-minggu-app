@@ -12,11 +12,6 @@ class LaporanPemuatanController extends Controller{
 
     public function addEntri(Request $request){
 
-        error_log(sys_get_temp_dir());
-
-        //Get the user id of the pengarang. For now let's just default it to 1
-        error_log($request->idPengarang);
-
         $entri = Entri::create([
             'nama_pengarang' => $request->namaPengarang,
             'judul_karya'=>$request->judul,
@@ -26,18 +21,46 @@ class LaporanPemuatanController extends Controller{
             'user_id_pembuat_entri'=>Auth::user()->id,
             'user_id_pengarang'=>$request->idPengarang,
         ]);
-
         if($entri){
-    
+           
             //uploading file
-            //for now the default file format is jpg. we will change this later
-            $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan",
-            $entri->id.".jpg");
+            // $filename = $request->file('fileBuktiPemuatan')->getClientOriginalName();
+            // $extension = ".".explode(".",$filename)[count(explode(".",$filename))-1];
+            // $filename = $entri->id."".$extension;
+            // $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan",$filename);
+            // error_log($file);
+            // if($file){
+
+            //     $entri = DB::table('entris')
+            //     ->where('id', $entri->id)
+            //     ->update(['bukti_pemuatan' => $filename]);
+
+            //     if($entri){
+            //         return response()->json([
+            //             'message' => 'success',
+            //             'entri' => $entri,
+            //         ]);
+            //     }
+            // }
+
+            $filename = $request->file('fileBuktiPemuatan')->getClientOriginalName();
+            $filename=rawurlencode($filename);
+            // $extension = ".".explode(".",$filename)[count(explode(".",$filename))-1];
+            // $filename = $entri->id."".$extension;
+            $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan/".$entri->id,$filename);
+            error_log($file);
             if($file){
-                return response()->json([
-                    'message' => 'success',
-                    'entri' => $entri,
-                ]);
+
+                $entri = DB::table('entris')
+                ->where('id', $entri->id)
+                ->update(['bukti_pemuatan' => $filename]);
+
+                if($entri){
+                    return response()->json([
+                        'message' => 'success',
+                        'entri' => $entri,
+                    ]);
+                }
             }
         }
         
@@ -49,17 +72,16 @@ class LaporanPemuatanController extends Controller{
 
     public function getEntri(Request $request){
 
-        //get entri and the pengarang of entri
+        
         $entris_with_pengarang_in_system = DB::table('entris')
             ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
-            // ->select('users.*', 'contacts.phone', 'orders.price')
             ->select('users.nama_lengkap', 'entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
-            'entris.tanggal_muat')
+            'entris.tanggal_muat','entris.bukti_pemuatan')
             ->get();
 
         $entris_without_pengarang_in_system = DB::table('entris')->where('user_id_pengarang', '=', 0)
         ->select('entris.nama_pengarang AS nama_lengkap','entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
-        'entris.tanggal_muat')
+        'entris.tanggal_muat','entris.bukti_pemuatan')
         ->get();
 
         $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
