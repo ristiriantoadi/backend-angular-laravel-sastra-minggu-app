@@ -5,25 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Entri;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class LaporanPemuatanController extends Controller{
 
     public function addEntri(Request $request){
-        
-        // $entri = new Entri;        
-        // $entri->nama_pengarang = $request->namaPengarang;
-        // $entri->judul_karya = $request->judul;
-        // $entri->jenis_karya = $request->jenisKarya;
-        // $entri->media = $request->media;
-        // $entri->tanggal_muat = $request->tanggalMuat;
-        // $entri->user_id_pembuat_entri = Auth::user()->id;
 
-        // $entri->user_id_pengarang = 1;
-        // $entri = $entri->save();
-        // error_log($entri);
+        error_log(sys_get_temp_dir());
 
         //Get the user id of the pengarang. For now let's just default it to 1
-        
+        error_log($request->idPengarang);
 
         $entri = Entri::create([
             'nama_pengarang' => $request->namaPengarang,
@@ -32,7 +24,7 @@ class LaporanPemuatanController extends Controller{
             'media'=>$request->media,
             'tanggal_muat'=>$request->tanggalMuat,
             'user_id_pembuat_entri'=>Auth::user()->id,
-            'user_id_pengarang'=>1,
+            'user_id_pengarang'=>$request->idPengarang,
         ]);
 
         if($entri){
@@ -56,8 +48,29 @@ class LaporanPemuatanController extends Controller{
     }
 
     public function getEntri(Request $request){
+
+        //get entri and the pengarang of entri
+        $entris = DB::table('entris')
+            ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
+            // ->select('users.*', 'contacts.phone', 'orders.price')
+            ->select('users.nama_lengkap', 'entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
+            'entris.tanggal_muat')
+            ->get();
+
         return response()->json([
-            'entris' => Entri::all()
+            'entris' => $entris
         ]);
+    }
+
+    public function getPengarang(Request $request){
+        
+        if ($request->has('nama-pengarang')) {
+            
+            $users = User::where('nama_lengkap', 'like', "%{$request->input('nama-pengarang')}%")->where('role','!=','admin')->get();
+            return response()->json([
+                'pengarangs' => $users,
+                'message' => 'success',
+             ]);
+        }
     }
 }
