@@ -21,12 +21,12 @@ class LaporanPemuatanController extends Controller{
             'user_id_pembuat_entri'=>Auth::user()->id,
             'user_id_pengarang'=>$request->idPengarang,
         ]);
-        if($entri){
 
+        if($entri){
+        
             $filename = $request->file('fileBuktiPemuatan')->getClientOriginalName();
-            // $filename=rawurlencode($filename);
             $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan/".$entri->id,$filename);
-            error_log($file);
+            
             if($file){
 
                 $entri = DB::table('entris')
@@ -50,7 +50,6 @@ class LaporanPemuatanController extends Controller{
 
     public function getEntri(Request $request){
 
-        
         $entris_with_pengarang_in_system = DB::table('entris')
             ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
             ->select('users.nama_lengkap', 'entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
@@ -64,9 +63,6 @@ class LaporanPemuatanController extends Controller{
 
         $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
 
-        // $entris=array_merge($entris_with_pengarang_in_system,$entris_without_pengarang_in_system);
-
-
         return response()->json([
             'entris' => $entris
         ]);
@@ -77,6 +73,7 @@ class LaporanPemuatanController extends Controller{
         if ($request->has('nama-pengarang')) {
             
             $users = User::where('nama_lengkap', 'like', "%{$request->input('nama-pengarang')}%")->where('role','!=','admin')->get();
+            
             return response()->json([
                 'pengarangs' => $users,
                 'message' => 'success',
@@ -85,26 +82,34 @@ class LaporanPemuatanController extends Controller{
     }
 
     public function deleteEntri(Request $request){
+        
         $entri = Entri::find($request->id);
-        if( $entri->delete()){
+        
+        if($entri->delete()){
             return response()->json([
                 'message' => 'success'
              ]);
         }
+        return response()->json([
+            'message' => 'error'
+         ]);
     }
 
     public function getEntriEdit(Request $request){
         
         if ($request->has('id')) {
-            $idEntri = $request->input('id');
+            
             $entri = Entri::find($request->id);
+            
             if($entri){
+                
                 return response()->json([
                     'message' => 'success',
                     'entri'=>$entri
                  ]);
             }
         }
+        
         return response()->json([
             'message' => 'error'
          ]);

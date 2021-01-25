@@ -14,16 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::get('/laporan_pemuatan',  'App\\Http\\Controllers\\LaporanPemuatanController@getEntri');
-
-Route::middleware('auth:sanctum')->post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri');
-Route::middleware('auth:sanctum')->get('/laporan_pemuatan/add/get_list_pengarang', 'App\\Http\\Controllers\\LaporanPemuatanController@getPengarang');
-Route::middleware('auth:sanctum')->post('/laporan_pemuatan/delete', 'App\\Http\\Controllers\\LaporanPemuatanController@deleteEntri');
-Route::middleware('auth:sanctum')->get('/laporan_pemuatan/edit', 'App\\Http\\Controllers\\LaporanPemuatanController@getEntriEdit');
-// Route::post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri');
-
-// Route::post('/login', 'App\Http\Controllers\Auth\LoginController@login');
+Route::get('/laporan_pemuatan/add/get_list_pengarang', 'App\\Http\\Controllers\\LaporanPemuatanController@getPengarang')->middleware('auth:sanctum');
+Route::get('/laporan_pemuatan/edit', 'App\\Http\\Controllers\\LaporanPemuatanController@getEntriEdit')->middleware('auth:sanctum');
+Route::post('/laporan_pemuatan/delete', 'App\\Http\\Controllers\\LaporanPemuatanController@deleteEntri')->middleware('auth:sanctum');
+Route::post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri')->middleware('auth:sanctum');
