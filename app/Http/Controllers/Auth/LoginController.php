@@ -37,7 +37,6 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        error_log("called");
         $credentials = $request->only('username', 'password');
         if (Auth::guard('web')->attempt($credentials,$request)) {
             return response()->json([

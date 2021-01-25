@@ -43,6 +43,7 @@ class RegisterController extends Controller
     }
 
     public function registerUser(Request $request){
+        
         $namaLengkap = $request->namaLengkap;
         $password = $request->password;
         $username = $request->username;
@@ -55,19 +56,23 @@ class RegisterController extends Controller
             ]);
         }
 
+        //insert new user
         $user = User::create([
             'username' => $username,
             'nama_lengkap'=>$namaLengkap,
             'role'=>'user',
             'password' => Hash::make($password),
         ]);
-
         if($user){
             return response()->json([
                 'message' => 'success',
                 'user'=>$user
             ]);
         }
+
+        return response()->json([
+            'message' => 'error'
+        ]);
     }
 
     /**
@@ -84,6 +89,7 @@ class RegisterController extends Controller
         ]);
     }
 
+    //register admin
     protected function register(Request $request){
         return User::create([
             'username' => $request->username,
@@ -91,6 +97,7 @@ class RegisterController extends Controller
             'role'=>'admin',
             'password' => Hash::make($request->password),
         ]);
+        
         Auth::logout();
     }
 
