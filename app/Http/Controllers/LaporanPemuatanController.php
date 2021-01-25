@@ -85,13 +85,28 @@ class LaporanPemuatanController extends Controller{
     }
 
     public function deleteEntri(Request $request){
-        // error_log("Id entri: ".$request->id);
         $entri = Entri::find($request->id);
         if( $entri->delete()){
             return response()->json([
                 'message' => 'success'
              ]);
         }
-        // error_log($result);
+    }
+
+    public function getEntriEdit(Request $request){
+        
+        if ($request->has('id')) {
+            $idEntri = $request->input('id');
+            $entri = Entri::find($request->id);
+            if($entri){
+                return response()->json([
+                    'message' => 'success',
+                    'entri'=>$entri
+                 ]);
+            }
+        }
+        return response()->json([
+            'message' => 'error'
+         ]);
     }
 }
