@@ -111,4 +111,36 @@ class LaporanPemuatanController extends Controller{
             'message' => 'error'
          ]);
     }
+
+    public function editEntri(Request $request){
+        // error_log("edit entri called");
+        if($request->file('file_bukti_pemuatan')){
+            $filename = $request->file('file_bukti_pemuatan')->getClientOriginalName();
+            DB::table('entris')
+            ->where('id', $request->id_entri)
+            ->update([
+                'nama_pengarang' => $request->nama_pengarang,
+                'judul_karya' => $request->judul,
+                'jenis_karya' => $request->jenis_karya,
+                'media' => $request->media,
+                'tanggal_muat' => $request->tanggal_muat,
+                'media' => $request->media,
+                'user_id_pengarang'=>$request->id_pengarang,
+                'bukti_pemuatan'=>$filename
+            ]);
+        }else{
+            DB::table('entris')
+            ->where('id', $request->id_entri)
+            ->update([
+                'nama_pengarang' => $request->nama_pengarang,
+                'judul_karya' => $request->judul,
+                'jenis_karya' => $request->jenis_karya,
+                'media' => $request->media,
+                'tanggal_muat' => $request->tanggal_muat,
+                'media' => $request->media,
+                'user_id_pengarang'=>$request->id_pengarang,
+            ]);
+        }
+
+    }
 }
