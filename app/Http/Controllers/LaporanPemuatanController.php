@@ -59,12 +59,22 @@ class LaporanPemuatanController extends Controller{
         ->select('entris.nama_pengarang AS nama_lengkap','entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
         'entris.tanggal_muat','entris.bukti_pemuatan')
         ->get();
+        
+        //merge and sort by date descending
         $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
+        $entris = $entris->sortByDesc('tanggal_muat')->values()->all();;
 
         return response()->json([
             'entris' => $entris
         ]);
     }
+
+    function date_compare($a, $b)
+    {
+        $t1 = strtotime($a['tanggal_muat']);
+        $t2 = strtotime($b['tanggal_muat']);
+        return $t1 - $t2;
+    }    
 
     public function getPengarang(Request $request){
         
