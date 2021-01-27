@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/laporan_pemuatan',  'App\\Http\\Controllers\\LaporanPemuatanController@getEntriAdmin');
+Route::get('/laporan_pemuatan',  'App\\Http\\Controllers\\LaporanPemuatanController@getEntri');
 Route::get('/laporan_pemuatan/add/get_list_pengarang', 'App\\Http\\Controllers\\LaporanPemuatanController@getPengarang');
 Route::get('/laporan_pemuatan/edit', 'App\\Http\\Controllers\\LaporanPemuatanController@getEntriEdit');
 Route::get('/laporan_pemuatan/search', 'App\\Http\\Controllers\\LaporanPemuatanController@searchEntris');

@@ -47,54 +47,53 @@ class LaporanPemuatanController extends Controller{
 
     }
 
+    public function getEntri(Request $request){
 
-    //get all entri data for user
-    public function getEntriUser(Request $request){
-        $entris = LaporanPemuatanController::getAllEntri();
-        foreach($entris as $entri) {
-            error_log($entri);
+        //the user needs editable boolean attribute added to entri
+        //because can only edit the entri that they added
+        //so user requirement is different from admin and guest
+        if(Auth::check()){
+            if(Auth::user()->role == "user"){
+                return LaporanPemuatanController::getEntriUser();
+            }
         }
+        
+        return response()->json([
+            'entris' => LaporanPemuatanController::getAllEntri()
+        ]);
+    }
+
+    public function getEntriUser(){
+        $entris = LaporanPemuatanController::getAllEntri();
+        
+        foreach($entris as $entri) {
+            if(Auth::user()->id == $entri->user_id_pembuat_entri)
+                $entri->editable=true;
+            else $entri->editable=false;
+        }
+        
+        return response()->json([
+            'entris' => $entris,
+            'message' => 'success',
+         ]);
 
     }
 
     public function getAllEntri(){
-        //get all entri data
         $entris_with_pengarang_in_system = DB::table('entris')
             ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
             ->select('users.nama_lengkap', 'entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
-            'entris.tanggal_muat','entris.bukti_pemuatan')
+            'entris.tanggal_muat','entris.bukti_pemuatan','entris.user_id_pengarang','entris.user_id_pembuat_entri')
             ->get();
         $entris_without_pengarang_in_system = DB::table('entris')->where('user_id_pengarang', '=', 0)
         ->select('entris.nama_pengarang AS nama_lengkap','entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
-        'entris.tanggal_muat','entris.bukti_pemuatan')
+        'entris.tanggal_muat','entris.bukti_pemuatan','entris.user_id_pengarang','entris.user_id_pembuat_entri')
         ->get();
         
         //merge and sort by date descending
         $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
         $entris = $entris->sortByDesc('tanggal_muat')->values()->all();;
         return $entris;
-    }
-
-    //get all entri data for admin
-    public function getEntriAdmin(Request $request){
-
-        //get all entri data
-        // $entris_with_pengarang_in_system = DB::table('entris')
-        //     ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
-        //     ->select('users.nama_lengkap', 'entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
-        //     'entris.tanggal_muat','entris.bukti_pemuatan')
-        //     ->get();
-        // $entris_without_pengarang_in_system = DB::table('entris')->where('user_id_pengarang', '=', 0)
-        // ->select('entris.nama_pengarang AS nama_lengkap','entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
-        // 'entris.tanggal_muat','entris.bukti_pemuatan')
-        // ->get();
-        
-        // //merge and sort by date descending
-        // $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
-        // $entris = $entris->sortByDesc('tanggal_muat')->values()->all();;
-        return response()->json([
-            'entris' => LaporanPemuatanController::getAllEntri()
-        ]);
     }
 
     public function getPengarang(Request $request){
