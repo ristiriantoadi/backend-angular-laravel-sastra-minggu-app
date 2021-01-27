@@ -47,8 +47,17 @@ class LaporanPemuatanController extends Controller{
 
     }
 
-    public function getEntri(Request $request){
 
+    //get all entri data for user
+    public function getEntriUser(Request $request){
+        $entris = LaporanPemuatanController::getAllEntri();
+        foreach($entris as $entri) {
+            error_log($entri);
+        }
+
+    }
+
+    public function getAllEntri(){
         //get all entri data
         $entris_with_pengarang_in_system = DB::table('entris')
             ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
@@ -63,18 +72,30 @@ class LaporanPemuatanController extends Controller{
         //merge and sort by date descending
         $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
         $entris = $entris->sortByDesc('tanggal_muat')->values()->all();;
-
-        return response()->json([
-            'entris' => $entris
-        ]);
+        return $entris;
     }
 
-    function date_compare($a, $b)
-    {
-        $t1 = strtotime($a['tanggal_muat']);
-        $t2 = strtotime($b['tanggal_muat']);
-        return $t1 - $t2;
-    }    
+    //get all entri data for admin
+    public function getEntriAdmin(Request $request){
+
+        //get all entri data
+        // $entris_with_pengarang_in_system = DB::table('entris')
+        //     ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
+        //     ->select('users.nama_lengkap', 'entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
+        //     'entris.tanggal_muat','entris.bukti_pemuatan')
+        //     ->get();
+        // $entris_without_pengarang_in_system = DB::table('entris')->where('user_id_pengarang', '=', 0)
+        // ->select('entris.nama_pengarang AS nama_lengkap','entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
+        // 'entris.tanggal_muat','entris.bukti_pemuatan')
+        // ->get();
+        
+        // //merge and sort by date descending
+        // $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
+        // $entris = $entris->sortByDesc('tanggal_muat')->values()->all();;
+        return response()->json([
+            'entris' => LaporanPemuatanController::getAllEntri()
+        ]);
+    }
 
     public function getPengarang(Request $request){
         
@@ -155,19 +176,10 @@ class LaporanPemuatanController extends Controller{
     }
 
     public function searchEntris(Request $request){
-        error_log("namaJudulMedia ".$request->input('namaJudulMedia'));
         $namaJudulMedia = $request->input('namaJudulMedia');
         $tanggalMuatAwal = $request->input('tanggalMuatAwal');
         $tanggalMuatAkhir = $request->input('tanggalMuatAkhir');
 
-        // $entris = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
-        //             ->whereOr('nama_pengarang','like',"%{$namaJudulMedia}%")
-        //             ->whereOr('judul_karya','like',"%{$namaJudulMedia}%")
-        //             ->whereOr('media','like',"%{$namaJudulMedia}%")
-        //             ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
-        //             'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan')
-        //             ->get();
-        
         
         $searchedByNamaPengarang = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
                     ->where('nama_pengarang','like',"%{$namaJudulMedia}%")
