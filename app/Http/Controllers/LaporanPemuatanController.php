@@ -89,7 +89,7 @@ class LaporanPemuatanController extends Controller{
         
         //merge and sort by date descending
         $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
-        $entris = $entris->sortByDesc('created_at')->values()->all();;
+        $entris = $entris->sortByDesc('id')->values()->all();;
         return $entris;
     }
 
@@ -197,7 +197,7 @@ class LaporanPemuatanController extends Controller{
         
         //merge and sort the data
         $entris=$searchedByNamaPengarang->merge($searchedByJudulKarya)->merge($searchedByMedia)->unique();
-        $entris = $entris->sortByDesc('created_at')->values()->all();;
+        $entris = $entris->sortByDesc('id')->values()->all();;
         
         if(Auth::check()){
             if(Auth::user()->role == "user"){
@@ -228,7 +228,7 @@ class LaporanPemuatanController extends Controller{
             ->where('entris.user_id_pengarang','=',$id)
             ->select('users.nama_lengkap', 'entris.*')
             ->get();
-        $entris = $entris->sortByDesc('created_at')->values()->all();;
+        $entris = $entris->sortByDesc('id')->values()->all();;
         
         return response()->json([
             'entris'=>$entris
