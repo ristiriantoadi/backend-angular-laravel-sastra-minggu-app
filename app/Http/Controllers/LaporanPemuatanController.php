@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Entri;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\KaryaDimuat;
 
 class LaporanPemuatanController extends Controller{
 
@@ -23,26 +24,22 @@ class LaporanPemuatanController extends Controller{
             'user_id_pengarang'=>$request->idPengarang,
         ]);
 
-        if($entri){
-            
-            //upload file bukti pemuatan
-            $filename = $request->file('fileBuktiPemuatan')->getClientOriginalName();
-            $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan/".$entri->id,$filename);
-            if($file){
-                $entri = DB::table('entris')
-                ->where('id', $entri->id)
-                ->update(['bukti_pemuatan' => $filename]);
-                if($entri){
-                    return response()->json([
-                        'message' => 'success',
-                        'entri' => $entri,
-                    ]);
-                }
-            }
-        }
+        //upload file bukti pemuatan
+        $filename = $request->file('fileBuktiPemuatan')->getClientOriginalName();
+        $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan/".$entri->id,$filename);
         
+        $entri->bukti_pemuatan = $filename;
+        $entri->save();
+
+        //pengarang exist inside system
+        if($request->idPengarang != 0){
+            $user = User::find($request->idPengarang);
+            $user->notify(new KaryaDimuat($entri));
+        }
+
         return response()->json([
-            'message' => 'error'
+            'message' => 'success',
+            'entri' => $entri,
         ]);
 
     }
@@ -92,13 +89,13 @@ class LaporanPemuatanController extends Controller{
         
         //merge and sort by date descending
         $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
-        $entris = $entris->sortByDesc('tanggal_muat')->values()->all();;
+        $entris = $entris->sortByDesc('created_at')->values()->all();;
         return $entris;
     }
 
     public function getPengarang(Request $request){
         
-        //get list of pengarang
+        //get list of pengarang for when adding new entri
         if ($request->has('nama-pengarang')) {
             $users = User::where('nama_lengkap', 'like', "%{$request->input('nama-pengarang')}%")
             ->where('role','!=','admin')->get();
@@ -143,7 +140,6 @@ class LaporanPemuatanController extends Controller{
     }
 
     public function editEntri(Request $request){
-        // error_log("edit entri called");
         if($request->file('file_bukti_pemuatan')){
             $filename = $request->file('file_bukti_pemuatan')->getClientOriginalName();
             DB::table('entris')
@@ -201,7 +197,7 @@ class LaporanPemuatanController extends Controller{
         
         //merge and sort the data
         $entris=$searchedByNamaPengarang->merge($searchedByJudulKarya)->merge($searchedByMedia)->unique();
-        $entris = $entris->sortByDesc('tanggal_muat')->values()->all(); 
+        $entris = $entris->sortByDesc('created_at')->values()->all();;
         
         if(Auth::check()){
             if(Auth::user()->role == "user"){
@@ -223,4 +219,20 @@ class LaporanPemuatanController extends Controller{
         }
         return $entris;
     }
+
+    function getEntrisUserPengarang($id){
+        // error_log("get entri user pengarang called");
+        // echo $id;
+        $entris=DB::table('entris')
+            ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
+            ->where('entris.user_id_pengarang','=',$id)
+            ->select('users.nama_lengkap', 'entris.*')
+            ->get();
+        $entris = $entris->sortByDesc('created_at')->values()->all();;
+        
+        return response()->json([
+            'entris'=>$entris
+        ]);
+    }
+
 }
