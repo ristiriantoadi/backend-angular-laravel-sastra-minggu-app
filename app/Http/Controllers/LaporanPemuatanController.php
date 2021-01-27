@@ -183,27 +183,44 @@ class LaporanPemuatanController extends Controller{
         $searchedByNamaPengarang = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
                     ->where('nama_pengarang','like',"%{$namaJudulMedia}%")
                     ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
-                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan')
+                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan',
+                    'entris.user_id_pengarang','entris.user_id_pembuat_entri')
                     ->get();
         $searchedByJudulKarya = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
                     ->where('judul_karya','like',"%{$namaJudulMedia}%")
                     ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
-                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan')
+                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan',
+                    'entris.user_id_pengarang','entris.user_id_pembuat_entri')
                     ->get();
         $searchedByMedia = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
                     ->where('media','like',"%{$namaJudulMedia}%")
                     ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
-                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan')
+                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan',
+                    'entris.user_id_pengarang','entris.user_id_pembuat_entri')
                     ->get();
         
         //merge and sort the data
         $entris=$searchedByNamaPengarang->merge($searchedByJudulKarya)->merge($searchedByMedia)->unique();
         $entris = $entris->sortByDesc('tanggal_muat')->values()->all(); 
-                   
+        
+        if(Auth::check()){
+            if(Auth::user()->role == "user"){
+                $entris=LaporanPemuatanController::setEditableOnEntris($entris);
+            }
+        }
         
         return response()->json([
             'message' => 'success',
             'entris'=>$entris
          ]);
+    }
+
+    function setEditableOnEntris($entris){
+        foreach($entris as $entri) {
+            if(Auth::user()->id == $entri->user_id_pembuat_entri)
+                $entri->editable=true;
+            else $entri->editable=false;
+        }
+        return $entris;
     }
 }
