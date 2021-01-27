@@ -153,4 +153,46 @@ class LaporanPemuatanController extends Controller{
         }
 
     }
+
+    public function searchEntris(Request $request){
+        error_log("namaJudulMedia ".$request->input('namaJudulMedia'));
+        $namaJudulMedia = $request->input('namaJudulMedia');
+        $tanggalMuatAwal = $request->input('tanggalMuatAwal');
+        $tanggalMuatAkhir = $request->input('tanggalMuatAkhir');
+
+        // $entris = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
+        //             ->whereOr('nama_pengarang','like',"%{$namaJudulMedia}%")
+        //             ->whereOr('judul_karya','like',"%{$namaJudulMedia}%")
+        //             ->whereOr('media','like',"%{$namaJudulMedia}%")
+        //             ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
+        //             'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan')
+        //             ->get();
+        
+        
+        $searchedByNamaPengarang = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
+                    ->where('nama_pengarang','like',"%{$namaJudulMedia}%")
+                    ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
+                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan')
+                    ->get();
+        $searchedByJudulKarya = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
+                    ->where('judul_karya','like',"%{$namaJudulMedia}%")
+                    ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
+                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan')
+                    ->get();
+        $searchedByMedia = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
+                    ->where('media','like',"%{$namaJudulMedia}%")
+                    ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
+                    'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan')
+                    ->get();
+        
+        //merge and sort the data
+        $entris=$searchedByNamaPengarang->merge($searchedByJudulKarya)->merge($searchedByMedia)->unique();
+        $entris = $entris->sortByDesc('tanggal_muat')->values()->all(); 
+                   
+        
+        return response()->json([
+            'message' => 'success',
+            'entris'=>$entris
+         ]);
+    }
 }
