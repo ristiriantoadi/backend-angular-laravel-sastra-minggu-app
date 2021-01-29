@@ -12,7 +12,6 @@ use App\Notifications\KaryaDimuat;
 class LaporanPemuatanController extends Controller{
 
     public function addEntri(Request $request){
-
         //insert new entri
         $entri = Entri::create([
             'nama_pengarang' => $request->namaPengarang,
@@ -23,29 +22,23 @@ class LaporanPemuatanController extends Controller{
             'user_id_pembuat_entri'=>Auth::user()->id,
             'user_id_pengarang'=>$request->idPengarang,
         ]);
-
         //upload file bukti pemuatan
         $filename = $request->file('fileBuktiPemuatan')->getClientOriginalName();
         $file = $request->file('fileBuktiPemuatan')->storeAs("public/bukti_pemuatan/".$entri->id,$filename);
-        
         $entri->bukti_pemuatan = $filename;
         $entri->save();
-
         //pengarang exist inside system
         if($request->idPengarang != 0){
             $user = User::find($request->idPengarang);
             $user->notify(new KaryaDimuat($entri));
         }
-
         return response()->json([
             'message' => 'success',
             'entri' => $entri,
         ]);
-
     }
 
     public function getEntri(Request $request){
-
         //the user needs editable boolean attribute added to entri
         //because can only edit the entri that they added
         //so user requirement is different from admin and guest
@@ -54,7 +47,6 @@ class LaporanPemuatanController extends Controller{
                 return LaporanPemuatanController::getEntriUser();
             }
         }
-        
         return response()->json([
             'entris' => LaporanPemuatanController::getAllEntri()
         ]);
@@ -62,18 +54,15 @@ class LaporanPemuatanController extends Controller{
 
     public function getEntriUser(){
         $entris = LaporanPemuatanController::getAllEntri();
-        
         foreach($entris as $entri) {
             if(Auth::user()->id == $entri->user_id_pembuat_entri)
                 $entri->editable=true;
             else $entri->editable=false;
         }
-        
         return response()->json([
             'entris' => $entris,
             'message' => 'success',
          ]);
-
     }
 
     public function getAllEntri(){
@@ -86,7 +75,6 @@ class LaporanPemuatanController extends Controller{
         ->select('entris.nama_pengarang AS nama_lengkap','entris.id', 'entris.judul_karya','entris.jenis_karya','entris.media',
         'entris.tanggal_muat','entris.bukti_pemuatan','entris.user_id_pengarang','entris.user_id_pembuat_entri')
         ->get();
-        
         //merge and sort by date descending
         $entris=$entris_with_pengarang_in_system->merge($entris_without_pengarang_in_system);
         $entris = $entris->sortByDesc('id')->values()->all();;
@@ -94,7 +82,6 @@ class LaporanPemuatanController extends Controller{
     }
 
     public function getPengarang(Request $request){
-        
         //get list of pengarang for when adding new entri
         if ($request->has('nama-pengarang')) {
             $users = User::where('nama_lengkap', 'like', "%{$request->input('nama-pengarang')}%")
@@ -107,7 +94,6 @@ class LaporanPemuatanController extends Controller{
     }
 
     public function deleteEntri(Request $request){
-        
         //delete entri
         $entri = Entri::find($request->id);
         if($entri->delete()){
@@ -115,14 +101,12 @@ class LaporanPemuatanController extends Controller{
                 'message' => 'success'
              ]);
         }
-
         return response()->json([
             'message' => 'error'
          ]);
     }
 
     public function getEntriEdit(Request $request){
-        
         //get entri to be edited
         if ($request->has('id')) {    
             $entri = Entri::find($request->id);
@@ -133,7 +117,6 @@ class LaporanPemuatanController extends Controller{
                  ]);
             }
         }
-        
         return response()->json([
             'message' => 'error'
          ]);
@@ -167,15 +150,12 @@ class LaporanPemuatanController extends Controller{
                 'user_id_pengarang'=>$request->id_pengarang,
             ]);
         }
-
     }
 
     public function searchEntris(Request $request){
         $namaJudulMedia = $request->input('namaJudulMedia');
         $tanggalMuatAwal = $request->input('tanggalMuatAwal');
         $tanggalMuatAkhir = $request->input('tanggalMuatAkhir');
-
-        
         $searchedByNamaPengarang = DB::table('entris')->whereBetween('tanggal_muat', [$tanggalMuatAwal,$tanggalMuatAkhir])
                     ->where('nama_pengarang','like',"%{$namaJudulMedia}%")
                     ->select('entris.nama_pengarang AS nama_lengkap', 'entris.id', 'entris.judul_karya',
@@ -194,17 +174,14 @@ class LaporanPemuatanController extends Controller{
                     'entris.jenis_karya','entris.media','entris.tanggal_muat','entris.bukti_pemuatan',
                     'entris.user_id_pengarang','entris.user_id_pembuat_entri')
                     ->get();
-        
         //merge and sort the data
         $entris=$searchedByNamaPengarang->merge($searchedByJudulKarya)->merge($searchedByMedia)->unique();
         $entris = $entris->sortByDesc('id')->values()->all();;
-        
         if(Auth::check()){
             if(Auth::user()->role == "user"){
                 $entris=LaporanPemuatanController::setEditableOnEntris($entris);
             }
         }
-        
         return response()->json([
             'message' => 'success',
             'entris'=>$entris
@@ -228,10 +205,8 @@ class LaporanPemuatanController extends Controller{
             ->select('users.nama_lengkap', 'entris.*')
             ->get();
         $entris = $entris->sortByDesc('id')->values()->all();;
-        
         return response()->json([
             'entris'=>$entris
         ]);
     }
-
 }
