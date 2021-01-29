@@ -13,7 +13,6 @@ class NotificationController extends Controller
         return response()->json([
             'notifications'=>$user->unreadNotifications
          ]);
-
     }
 
     public function readNotifications(Request $request){
