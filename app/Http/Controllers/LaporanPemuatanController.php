@@ -220,9 +220,8 @@ class LaporanPemuatanController extends Controller{
         return $entris;
     }
 
+    //get entris where user is the Pengarang
     function getEntrisUserPengarang($id){
-        // error_log("get entri user pengarang called");
-        // echo $id;
         $entris=DB::table('entris')
             ->join('users', 'users.id', '=', 'entris.user_id_pengarang')
             ->where('entris.user_id_pengarang','=',$id)
