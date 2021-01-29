@@ -19,8 +19,9 @@ Route::get('/laporan_pemuatan/add/get_list_pengarang', 'App\\Http\\Controllers\\
 Route::get('/laporan_pemuatan/edit', 'App\\Http\\Controllers\\LaporanPemuatanController@getEntriEdit');
 Route::get('/laporan_pemuatan/search', 'App\\Http\\Controllers\\LaporanPemuatanController@searchEntris');
 Route::get('/laporan_pemuatan/user/{id}', 'App\\Http\\Controllers\\LaporanPemuatanController@getEntrisUserPengarang')->middleware('auth:sanctum');
-Route::get('/user/notifications', 'App\\Http\\Controllers\\NotificationController@index')->middleware('auth:sanctum')->middleware('auth:sanctum');
 Route::post('/laporan_pemuatan/delete', 'App\\Http\\Controllers\\LaporanPemuatanController@deleteEntri')->middleware('auth:sanctum');
 Route::post('/laporan_pemuatan/add', 'App\\Http\\Controllers\\LaporanPemuatanController@addEntri')->middleware('auth:sanctum');
 Route::post('/laporan_pemuatan/edit', 'App\\Http\\Controllers\\LaporanPemuatanController@editEntri')->middleware('auth:sanctum');
+
+Route::get('/user/notifications', 'App\\Http\\Controllers\\NotificationController@index')->middleware('auth:sanctum')->middleware('auth:sanctum');
 Route::post('/user/notifications', 'App\\Http\\Controllers\\NotificationController@readNotifications')->middleware('auth:sanctum')->middleware('auth:sanctum');
