@@ -14,9 +14,22 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+//spa routes
+Route::get('/', function() {
+    return File::get(public_path() . '/build/index.html');
+  });
+Route::get('/admin/{path?}', function() {
+    return File::get(public_path() . '/build/index.html');
+  });
+Route::get('/user/{path?}', function() {
+    return File::get(public_path() . '/build/index.html');
+  });
+
+Auth::routes();
+
+//helper routes
 Route::post("/register/user",'App\Http\Controllers\Auth\RegisterController@registerUser');
 Route::post("/login",'App\Http\Controllers\Auth\LoginController@login');
-Auth::routes();
 Route::get('/logout', function(){
     Auth::logout();
     return "logged out";
